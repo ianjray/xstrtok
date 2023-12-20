@@ -1,0 +1,25 @@
+.POSIX:
+.SUFFIXES:
+
+CC         = @CC@
+CCOV       = gcov
+CFLAGS     = @CFLAGS@
+CFLAGS_COV = @CFLAGS_COV@
+CFLAGS_SAN = @CFLAGS_SAN@
+
+.PHONY: all
+all: xstrtok.coverage
+
+xstrtok.coverage: xstrtok.c test_xstrtok.c
+	$(CC) $(CFLAGS) $(CFLAGS_COV) $(CFLAGS_SAN) $^ -o $@
+	./$@
+	$(CCOV) xstrtok.c
+	! grep "#####" xstrtok.c.gcov |grep -ve "// UNREACHABLE$$"
+
+.PHONY: clean
+clean:
+	rm -rf *.gc?? *.coverage
+
+.PHONY: distclean
+distclean: clean
+	rm -f Makefile config.status
